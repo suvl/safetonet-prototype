@@ -7,5 +7,6 @@ namespace SafeToNet.Prototype.Core.Configuration
         public string ApiKey { get; set; }
 
         public string MessageResource { get; set; } = "/message?v={version}&q={query}";
+        public string SpeechResource { get; set; } = "/speech?v={version}";
     }
 }

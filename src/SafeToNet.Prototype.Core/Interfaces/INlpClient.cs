@@ -13,5 +13,13 @@ namespace SafeToNet.Prototype.Core.Interfaces
         /// <param name="message">The message.</param>
         /// <returns>Task&lt;Domain.ParseResult&gt;.</returns>
         Task<Domain.ParseResult> Parse(string message);
+
+        /// <summary>
+        /// Parses the speech.
+        /// </summary>
+        /// <param name="speech">The speech.</param>
+        /// <returns>Task&lt;ParseResult&gt;.</returns>
+        /// <exception cref="ArgumentNullException">speech - No speech data given.</exception>
+        Task<Domain.ParseResult> ParseSpeech(byte[] speech);
     }
 }

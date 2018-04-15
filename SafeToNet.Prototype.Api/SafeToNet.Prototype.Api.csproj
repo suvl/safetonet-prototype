@@ -25,6 +25,15 @@
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Controllers\SampleDataController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\SafeToNet.Prototype.Core\SafeToNet.Prototype.Core.csproj" />
+    <ProjectReference Include="..\src\SafeToNet.Prototype.ExternalClients\SafeToNet.Prototype.ExternalClients.csproj" />
+  </ItemGroup>
+
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="true">
