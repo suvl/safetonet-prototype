@@ -13,4 +13,8 @@
     <ProjectReference Include="../SafeToNet.Prototype.Core/SafeToNet.Prototype.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Food2Fork\" />
+  </ItemGroup>
+
 </Project>
