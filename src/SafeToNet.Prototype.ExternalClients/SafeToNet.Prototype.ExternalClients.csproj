@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -10,11 +10,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.0-preview1-final" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.0-preview1-final" />
     <PackageReference Include="WitAi.DotNet.Api" Version="1.4.0" />
+    <PackageReference Include="TinyMapper" Version="3.0.1-beta" />
     <ProjectReference Include="../SafeToNet.Prototype.Core/SafeToNet.Prototype.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Food2Fork\" />
   </ItemGroup>
 
 </Project>

@@ -4,4 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SafeToNet.Prototype.Core\SafeToNet.Prototype.Core.csproj" />
+    <ProjectReference Include="..\SafeToNet.Prototype.ExternalClients\SafeToNet.Prototype.ExternalClients.csproj" />
+  </ItemGroup>
+
 </Project>

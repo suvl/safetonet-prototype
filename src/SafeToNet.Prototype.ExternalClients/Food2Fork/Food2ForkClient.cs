@@ -1,6 +1,7 @@
 ﻿using Flurl.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Nelibur.ObjectMapper;
 using SafeToNet.Prototype.Core.Domain;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,12 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
         private readonly IOptionsSnapshot<Core.Configuration.Food2ForkConfiguration> _configuration;
         private readonly IFlurlClient _client;
         private readonly ILogger _logger;
+
+        static Food2ForkClient()
+        {
+            TinyMapper.Bind<Recipe, Core.Domain.Recipe>();
+            TinyMapper.Bind<RecipeSearchResult, Core.Domain.RecipeSearchResult>();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Food2ForkClient"/> class.
@@ -40,7 +47,7 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <returns>Task&lt;Domain.Recipe&gt;.</returns>
-        public Task<Recipe> Get(string id)
+        public async Task<Core.Domain.Recipe> Get(string id)
         {
             if (string.IsNullOrEmpty(id))
                 throw new ArgumentNullException(nameof(id));
@@ -51,7 +58,13 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
                     .Replace("{key}", _configuration.Value.ApiKey)
                     .Replace("{id}", id);
 
-                return uri.GetJsonAsync<Recipe>();
+                var result = await uri.GetStringAsync();
+
+                _logger.LogDebug("GET {uri} = {result}", uri, result);
+
+                var recipe = Newtonsoft.Json.JsonConvert.DeserializeObject<RecipeGetResult>(result);
+
+                return TinyMapper.Map<Core.Domain.Recipe>(recipe.Recipe);
             }
         }
 
@@ -60,7 +73,7 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
         /// </summary>
         /// <param name="ingredients">The ingredients.</param>
         /// <returns>Task&lt;Domain.RecipeSearchResult&gt;.</returns>
-        public Task<RecipeSearchResult> Search(string[] ingredients)
+        public Task<Core.Domain.RecipeSearchResult> Search(string[] ingredients)
         {
             using (_logger.BeginScope("Food2ForkClient.Search"))
             {
@@ -75,7 +88,13 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
                     request = request.SetQueryParam(_configuration.Value.SearchQueryParameter, query);
                 }
 
-                return request.GetJsonAsync<RecipeSearchResult>();
+                return request
+                    .GetJsonAsync<RecipeSearchResult>()
+                    .ContinueWith(t =>
+                    {
+                        _logger.LogDebug("Result {result}", t.Result);
+                        return TinyMapper.Map<Core.Domain.RecipeSearchResult>(t.Result);
+                    });
             }
         }
     }

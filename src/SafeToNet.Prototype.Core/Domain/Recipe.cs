@@ -6,6 +6,8 @@ namespace SafeToNet.Prototype.Core.Domain
 {
     public class Recipe
     {
+        public string RecipeId { get; set; }
+
         public string ImageUrl { get; set; }
 
         public string SourceUrl { get; set; }
@@ -19,5 +21,7 @@ namespace SafeToNet.Prototype.Core.Domain
         public string PublisherUrl { get; set; }
 
         public int SocialRank { get; set; }
+
+        public string[] Ingredients { get; set; }
     }
 }
