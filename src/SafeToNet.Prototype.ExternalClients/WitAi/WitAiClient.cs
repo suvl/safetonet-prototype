@@ -12,6 +12,7 @@ namespace SafeToNet.Prototype.ExternalClients.WitAi
 {
     using Core.Configuration;
     using Core.Domain;
+    using Flurl.Http;
 
     /// <inheritdoc />
     /// <summary>
@@ -21,35 +22,24 @@ namespace SafeToNet.Prototype.ExternalClients.WitAi
     {
         private readonly IOptionsSnapshot<WitAiConfiguration> _configSnapshot;
         private readonly ILogger _logger;
-        private readonly HttpClient _client;
+        private readonly FlurlClient _client;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WitAiClient" /> class.
         /// </summary>
         /// <param name="logger">The logger.</param>
         /// <param name="snapshot">The snapshot.</param>
-        /// <param name="handler">The handler.</param>
         /// <exception cref="ArgumentNullException">
         /// logger or
         /// snapshot or 
         /// handler
         /// </exception>
-        public WitAiClient(ILogger<WitAiClient> logger, IOptionsSnapshot<WitAiConfiguration> snapshot, HttpMessageHandler handler)
+        public WitAiClient(ILogger<WitAiClient> logger, IOptionsSnapshot<WitAiConfiguration> snapshot)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configSnapshot = snapshot ?? throw new ArgumentNullException(nameof(snapshot));
-            _client = new HttpClient(handler ?? throw new ArgumentNullException(nameof(handler)));
+            _client = new FlurlClient(_configSnapshot.Value.BaseUrl);
             _logger.LogDebug("WitAiClient .ctor");
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="WitAiClient"/> class.
-        /// </summary>
-        /// <param name="logger">The logger.</param>
-        /// <param name="snapshot">The snapshot.</param>
-        public WitAiClient(ILogger<WitAiClient> logger, IOptionsSnapshot<WitAiConfiguration> snapshot)
-            : this(logger, snapshot, new HttpClientHandler())
-        {
         }
 
         /// <inheritdoc />
@@ -72,7 +62,10 @@ namespace SafeToNet.Prototype.ExternalClients.WitAi
 
                 _logger.LogDebug("Requesting GET {uri}", uri);
 
-                var responseJson = await _client.GetStringAsync(uri).ConfigureAwait(false);
+                var responseJson = await uri
+                    .WithClient(_client)
+                    .WithOAuthBearerToken(_configSnapshot.Value.ApiKey)
+                    .GetStringAsync();
 
                 _logger.LogDebug("Response JSON: {json}", responseJson);
 
@@ -85,6 +78,7 @@ namespace SafeToNet.Prototype.ExternalClients.WitAi
                     ErrorMessage = response.ErrorMessage
                 };
 
+                if (response.Entities != null)
                 foreach (var responseEntity in response.Entities)
                 {
                     _logger.LogDebug(
