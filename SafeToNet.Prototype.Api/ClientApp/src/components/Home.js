@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button } from 'react-bootstrap';
 import DetectRTC from 'detectrtc';
 import RecordRTC from 'recordrtc';
 
@@ -7,7 +8,7 @@ const RECORDER_STOP_DELAY_MS = 500;
 export class Home extends Component {
   constructor() {
     super();
-    this.state = { recorder = null, audioStream = null, errorMsg = null };
+    this.state = { recorder: null, audioStream: null, errorMsg: null };
 
     this.initAudio();
   }
@@ -27,7 +28,7 @@ export class Home extends Component {
 
   tapStart(e, touch) {
     var options = {
-        recorderType: StereoAudioRecorder,
+        //recorderType: StereoAudioRecorder,
         mimeType: 'audio/wav',
         numberOfAudioChannels: 1,
         desiredSampRate: 16000
@@ -47,8 +48,14 @@ export class Home extends Component {
 
   tapEnd(e, touch) {
     setTimeout(function () {
-        this.state.recorder && this.state.recorder.stopRecording(stoppedRecording);
+        this.state.recorder && this.state.recorder.stopRecording(this.stoppedRecording);
     }, RECORDER_STOP_DELAY_MS);
+  }
+
+  stoppedRecording() {
+    console.log("Stopped recording.");
+    var blob = this.state.recorder.getBlob();
+    this.state.recorder.initRecorder();
   }
 
   displayName = Home.name
@@ -58,6 +65,7 @@ export class Home extends Component {
       <div>
         <h1>Recipe Search 3000™</h1>
 
+        <Button bsStyle="primary" bsSize="large">Search</Button>
 
       </div>
     );
