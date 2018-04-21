@@ -12,7 +12,7 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
 {
     public class Food2ForkClient : Core.Interfaces.IRecipeAggregatorClient
     {
-        private readonly IOptionsSnapshot<Core.Configuration.Food2ForkConfiguration> _configuration;
+        private readonly IOptions<Core.Configuration.Food2ForkConfiguration> _configuration;
         private readonly IFlurlClient _client;
         private readonly ILogger _logger;
 
@@ -32,7 +32,7 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
         /// or
         /// configuration
         /// </exception>
-        public Food2ForkClient(ILogger<Food2ForkClient> logger, IOptionsSnapshot<Core.Configuration.Food2ForkConfiguration> configuration)
+        public Food2ForkClient(ILogger<Food2ForkClient> logger, IOptions<Core.Configuration.Food2ForkConfiguration> configuration)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
@@ -72,13 +72,15 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
         /// Searches for the specified ingredients.
         /// </summary>
         /// <param name="ingredients">The ingredients.</param>
+        /// <param name="sorting">The sorting.</param>
         /// <returns>Task&lt;Domain.RecipeSearchResult&gt;.</returns>
-        public Task<Core.Domain.RecipeSearchResult> Search(string[] ingredients)
+        public Task<Core.Domain.RecipeSearchResult> Search(string[] ingredients, SearchSorting sorting)
         {
             using (_logger.BeginScope("Food2ForkClient.Search"))
             {
                 var uri = $"{_configuration.Value.BaseUrl}{_configuration.Value.SearchResource}"
-                    .Replace("{key}", _configuration.Value.ApiKey);
+                    .Replace("{key}", _configuration.Value.ApiKey)
+                    .Replace("{sorting}", GetSortValue(sorting));
 
                 var request = uri.WithClient(_client);
 
@@ -95,6 +97,19 @@ namespace SafeToNet.Prototype.ExternalClients.Food2Fork
                         _logger.LogDebug("Result {result}", t.Result);
                         return TinyMapper.Map<Core.Domain.RecipeSearchResult>(t.Result);
                     });
+            }
+        }
+
+        private static string GetSortValue(SearchSorting sorting)
+        {
+            switch (sorting)
+            {
+                case SearchSorting.Rating:
+                    return "r";
+                case SearchSorting.Trending:
+                    return "t";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sorting), sorting, null);
             }
         }
     }

@@ -2,6 +2,8 @@
 using SafeToNet.Prototype.Core.Domain;
 using SafeToNet.Prototype.Core.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SafeToNet.Prototype.Business
@@ -9,7 +11,7 @@ namespace SafeToNet.Prototype.Business
     /// <summary>
     /// Search business layer implementation.
     /// </summary>
-    public class SearchBusiness
+    public class SearchBusiness : ISearchBusiness
     {
         private readonly INlpClient _nlpClient;
         private readonly IRecipeAggregatorClient _recipeAggregatorClient;
@@ -55,14 +57,7 @@ namespace SafeToNet.Prototype.Business
             {
                 // natural language processing
                 var nlpResults = await _nlpClient.ParseSpeech(speech);
-
-                // process results
-
-
-                // get recipes
-                var recipeSearchResults = await _recipeAggregatorClient.Search(new string[0]);
-
-                return recipeSearchResults;
+                return await ProcessAndGetRecipes(nlpResults);
             }
         }
 
@@ -81,20 +76,50 @@ namespace SafeToNet.Prototype.Business
             {
                 // natural language processing
                 var nlpResults = await _nlpClient.Parse(text);
-
-                // process results
-
-
-                // get recipes
-                var recipeSearchResults = await _recipeAggregatorClient.Search(new string[0]);
-
-                return recipeSearchResults;
+                return await ProcessAndGetRecipes(nlpResults);
             }
         }
 
+        private Task<RecipeSearchResult> ProcessAndGetRecipes(ParseResult nlpResults)
+        {
+            // process results
+            var processedIntent = ProcessNlpResults(nlpResults);
+            var sorting = _sortings[processedIntent.intent];
+            // get recipes
+            return _recipeAggregatorClient.Search(processedIntent.ingredients, sorting);
+        }
+
+        private readonly string[] _conjunctions = {"and", "or"};
+
         private (string intent, string[] ingredients) ProcessNlpResults(ParseResult nlpResult)
         {
-            return ("popular", new string[0]);
+            string intent = "recipe";
+            List<string> ingredients = new List<string>();
+            foreach (var entity in nlpResult.Entities)
+            {
+                switch (entity.Name)
+                {
+                    case "user_intent":
+                        intent = entity.Values
+                            .OrderByDescending(e => e.Confidence)
+                            .First()
+                            .Value;
+                        break;
+                    case "search_query":
+                        var queries = entity.Values
+                            .SelectMany(v => v.Value.Split(_conjunctions, StringSplitOptions.RemoveEmptyEntries));
+                        ingredients.AddRange(queries);
+                        break;
+                }
+            }
+
+            return (intent, ingredients.ToArray());
         }
+
+        private static readonly IDictionary<string, SearchSorting> _sortings = new Dictionary<string, SearchSorting>
+        {
+            { "recipe", SearchSorting.Rating },
+            { "popular", SearchSorting.Trending }
+        };
     }
 }

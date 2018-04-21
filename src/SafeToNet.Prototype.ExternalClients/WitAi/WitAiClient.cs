@@ -17,7 +17,7 @@ namespace SafeToNet.Prototype.ExternalClients.WitAi
     /// </summary>
     public class WitAiClient : Core.Interfaces.INlpClient
     {
-        private readonly IOptionsSnapshot<WitAiConfiguration> _configSnapshot;
+        private readonly IOptions<WitAiConfiguration> _configSnapshot;
         private readonly ILogger _logger;
         private readonly FlurlClient _client;
 
@@ -25,16 +25,16 @@ namespace SafeToNet.Prototype.ExternalClients.WitAi
         /// Initializes a new instance of the <see cref="WitAiClient" /> class.
         /// </summary>
         /// <param name="logger">The logger.</param>
-        /// <param name="snapshot">The snapshot.</param>
+        /// <param name="configuration">The configuration.</param>
         /// <exception cref="ArgumentNullException">
         /// logger or
-        /// snapshot or 
+        /// configuration or 
         /// handler
         /// </exception>
-        public WitAiClient(ILogger<WitAiClient> logger, IOptionsSnapshot<WitAiConfiguration> snapshot)
+        public WitAiClient(ILogger<WitAiClient> logger, IOptions<WitAiConfiguration> configuration)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _configSnapshot = snapshot ?? throw new ArgumentNullException(nameof(snapshot));
+            _configSnapshot = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _client = new FlurlClient(_configSnapshot.Value.BaseUrl);
             _logger.LogDebug("WitAiClient .ctor");
         }

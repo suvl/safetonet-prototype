@@ -11,6 +11,7 @@ namespace SafeToNet.Prototype.Core.Configuration
 
         public string SearchResource { get; set; } = "/api/search?key={key}";
         public string SearchQueryParameter { get; set; } = "q";
+        public string SortQueryParameter { get; set; } = "sort";
         public string GetResource { get; set; } = "/api/get?key={key}&rId={id}";
     }
 }
