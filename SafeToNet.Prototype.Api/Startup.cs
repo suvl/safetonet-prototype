@@ -45,6 +45,8 @@ namespace SafeToNet.Prototype.Api
 
             services.AddSingleton<ISearchBusiness, Business.SearchBusiness>();
 
+            services.AddCors();
+
             services
                 .AddMvcCore()
                 .AddApiExplorer()
@@ -92,6 +94,11 @@ namespace SafeToNet.Prototype.Api
                         serializer.Serialize(textWritter, e);
                 }
             });
+
+            app.UseCors(builder => builder
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowAnyOrigin());
 
             app.UseSwagger();
             app.UseSwaggerUI(c => 

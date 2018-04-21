@@ -6,6 +6,7 @@ using Xunit;
 using System.Collections.Generic;
 using AutoFixture;
 using System.Linq;
+using SafeToNet.Prototype.Core.Domain;
 
 namespace SafeToNet.Prototype.ExternalClients.Tests
 {
@@ -18,7 +19,7 @@ namespace SafeToNet.Prototype.ExternalClients.Tests
 
             var config = new Core.Configuration.Food2ForkConfiguration
             {
-                ApiKey = @"cb2be9c88acfcfe5ee6677af72630d44",
+                ApiKey = System.Environment.GetEnvironmentVariable("ApiKey"),
                 BaseUrl = @"https://food2fork.com"
             };
             var options = new Mock<IOptionsSnapshot<Core.Configuration.Food2ForkConfiguration>>(MockBehavior.Strict);
@@ -26,7 +27,7 @@ namespace SafeToNet.Prototype.ExternalClients.Tests
 
             var sut = new Food2Fork.Food2ForkClient(logger.Object, options.Object);
 
-            var results = await sut.Search(new[] { "tomato", "rice" });
+            var results = await sut.Search(new[] { "tomato", "rice" }, SearchSorting.Rating);
 
             Assert.NotNull(results);
             Assert.True(results.Count > 0);

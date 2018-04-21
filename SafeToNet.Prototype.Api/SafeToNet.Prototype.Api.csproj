@@ -28,10 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\SampleDataController.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\src\SafeToNet.Prototype.Business\SafeToNet.Prototype.Business.csproj" />
     <ProjectReference Include="..\src\SafeToNet.Prototype.Core\SafeToNet.Prototype.Core.csproj" />
     <ProjectReference Include="..\src\SafeToNet.Prototype.ExternalClients\SafeToNet.Prototype.ExternalClients.csproj" />
