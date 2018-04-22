@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Media, Grid, Row, Col, Link } from 'react-bootstrap';
+import { Media, Grid, Row, Col } from 'react-bootstrap';
 
 export class Recipe extends Component {
     render() {
@@ -8,7 +8,7 @@ export class Recipe extends Component {
             <div>
                 <Media>
                     <Media.Left>
-                        <img src={recipe.imageUrl} style={{width:'10em',height:'auto'}} />
+                        <img src={recipe.imageUrl} alt={recipe.title} style={{width:'10em',height:'auto'}} />
                     </Media.Left>
                     <Media.Body>
                         <Media.Heading>{recipe.title}</Media.Heading>

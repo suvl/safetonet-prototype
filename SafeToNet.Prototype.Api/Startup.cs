@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SafeToNet.Prototype.Core.Interfaces;
+using Newtonsoft.Json;
 
 namespace SafeToNet.Prototype.Api
 {
@@ -47,11 +48,14 @@ namespace SafeToNet.Prototype.Api
 
             services.AddCors();
 
-            services
-                .AddMvcCore()
-                .AddApiExplorer()
-                .AddJsonFormatters()
-                .SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
 
             services.AddSwaggerGen(cfg =>
             {
@@ -60,12 +64,6 @@ namespace SafeToNet.Prototype.Api
                     Title = "SafeToNet Prototype API v1",
                     Version = "v1"
                 });
-            });
-
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/build";
             });
         }
 
@@ -77,23 +75,24 @@ namespace SafeToNet.Prototype.Api
         /// <param name="env">The env.</param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.Use(async (ctx, next) =>
-            {
-                try
-                {
-                    await next();
-                }
-                catch (Exception e)
-                {
-                    if (ctx.Response.HasStarted) throw;
+            // app.Use(async (ctx, next) =>
+            // {
+            //     try
+            //     {
+            //         await next();
+            //     }
+            //     catch (Exception e)
+            //     {
+            //         if (ctx.Response.HasStarted) throw;
 
-                    ctx.Response.StatusCode = 500;
-                    ctx.Response.ContentType = "application/json";
-                    var serializer = new Newtonsoft.Json.JsonSerializer();
-                    using (var textWritter = new System.IO.StreamWriter(ctx.Response.Body))
-                        serializer.Serialize(textWritter, e);
-                }
-            });
+            //         ctx.Response.StatusCode = 500;
+            //         ctx.Response.ContentType = "application/json";
+                    
+            //         var serializer = new JsonSerializer();
+            //         using (var textWritter = new System.IO.StreamWriter(ctx.Response.Body))
+            //             serializer.Serialize(textWritter, e);
+            //     }
+            // });
 
             app.UseCors(builder => builder
                 .AllowAnyHeader()
@@ -104,6 +103,8 @@ namespace SafeToNet.Prototype.Api
             app.UseSwaggerUI(c => 
                 c.SwaggerEndpoint("v1/swagger.json", "SafeToNet Prototype API V1"));
 
+            app.UseHsts();
+            
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
@@ -117,11 +118,12 @@ namespace SafeToNet.Prototype.Api
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
+                spa.UseReactDevelopmentServer(npmScript: "start");
 
-                if (env.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
+                // if (env.IsDevelopment())
+                // {
+                //     spa.UseReactDevelopmentServer(npmScript: "start");
+                // }
             });
         }
     }

@@ -122,14 +122,22 @@ namespace SafeToNet.Prototype.ExternalClients.WitAi
                 {
                     content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("audio/wav");
 
+                    _logger.LogDebug(content.Headers.ContentType.ToString());
+
                     using (var response = await uri
                         .WithClient(_client)
+                        .AllowAnyHttpStatus()
                         .WithOAuthBearerToken(_configSnapshot.Value.ApiKey)
                         .PostAsync(content))
                     {
-                        response.EnsureSuccessStatusCode();
-
                         var data = await response.Content.ReadAsStringAsync();
+                        
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            _logger.LogDebug(data);
+                            response.EnsureSuccessStatusCode();
+                        }
+
 
                         _logger.LogDebug($"response data: {data}");
 

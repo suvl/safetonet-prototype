@@ -1,7 +1,4 @@
 import React, { Component } from 'react';
-import { Button, FormGroup, ControlLabel, FormControl, HelpBlock } from 'react-bootstrap';
-import DetectRTC from 'detectrtc';
-import RecordRTC from 'recordrtc';
 import { RecipeList } from './RecipeList';
 
 export class Popular extends Component {

@@ -55,6 +55,8 @@ namespace SafeToNet.Prototype.Business
 
             using (_logger.BeginScope("SearchBusiness.SearchWithSpeech"))
             {
+                _logger.LogDebug($"speech array: {speech.Length}");
+
                 // natural language processing
                 var nlpResults = await _nlpClient.ParseSpeech(speech);
                 return await ProcessAndGetRecipes(nlpResults);
