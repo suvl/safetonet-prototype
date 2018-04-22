@@ -103,3 +103,6 @@ if you need logging, set `ASPNETCORE_ENVIRONMENT=Development` too.
 If not using docker, just cd to `SafeToNet.Prototype.Api` and do `dotnet run` or `dotnet watch run`, changing the values at 
 appsettings.json or with env variables. Then as the nodejs server might not work, cd to `ClientApp` and run `react-scripts start`.
 
+As I've published the image to Dockerhub, you can also simply do this:
+
+`docker run --rm -it -p 80:80 -e WitAiConfiguration__ApiKey=$WITAPIKEY -e Food2ForkConfiguration__ApiKey=$FOODtoFORKAPI suvl/stn-prototype` 
