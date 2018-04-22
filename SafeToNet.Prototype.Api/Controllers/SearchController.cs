@@ -51,6 +51,14 @@ namespace SafeToNet.Prototype.Api.Controllers
             if (Request.HasFormContentType)
             {
                 var form = await Request.ReadFormAsync();
+                if (form.Files.Count(f => f.ContentType.Contains(fileType)) == 0)
+                {
+                    foreach (var file in form.Files)
+                    {
+                        _logger.LogDebug($"type: {file.ContentType}");
+                    }
+                    throw new Exception($"No file of type {fileType} provided ({form.Files.Count()})");
+                }
                 if (form.Files.Count(f => f.ContentType.Contains(fileType)) == 1)
                 {
                     var file = form.Files.FirstOrDefault(f => f.ContentType.Contains(fileType));

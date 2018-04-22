@@ -4,7 +4,7 @@ import DetectRTC from 'detectrtc';
 import RecordRTC, { StereoAudioRecorder } from 'recordrtc';
 import { RecipeList } from './RecipeList';
 
-const API_URL = process.env.API_URL || "https://a51c7752.ngrok.io/";
+const API_URL = process.env.API_URL || '';
 
 let globalBlob;
 
